@@ -32,12 +32,12 @@ jobs:
 
       - name: Copy files to VM
         run: |
-          scp -o StrictHostKeyChecking=no -i key.pem -r . ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/${{ secrets.VM_USER }}/node-app
+          scp -o StrictHostKeyChecking=no -i key.pem -r . ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/${{ secrets.VM_USER }}/authService
 
       - name: Run Docker container on VM
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-            cd /home/${{ secrets.VM_USER }}/node-app
+            cd /home/${{ secrets.VM_USER }}/authService
             docker build -t auth-service .
             docker stop node-container || true
             docker rm node-container || true
