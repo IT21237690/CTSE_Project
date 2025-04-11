@@ -1,8 +1,3 @@
-name: Deploy to Assure VM
-
-on:
-  workflow_dispatch:
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -11,11 +6,19 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Set up Docker BuildKit
+        run: echo "DOCKER_BUILDKIT=1" >> $GITHUB_ENV  # Enabling BuildKit
+
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
-        run: docker build -t auth-service .
+      - name: Build app dependencies
+        run: |
+          docker build --target build-deps -t auth-service .
+
+      - name: Build final Docker image
+        run: |
+          docker build --target final -t auth-service .
 
       - name: Save private key
         run: |
