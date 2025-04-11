@@ -1,3 +1,8 @@
+name: Deploy to Assure VM
+
+on:
+  workflow_dispatch:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -38,3 +43,4 @@ jobs:
             docker rm node-container || true
             docker run -d -p 5000:5000 --name node-container auth-service
           EOF
+
