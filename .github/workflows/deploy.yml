@@ -1,0 +1,37 @@
+name: Deploy to Assure VM
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: docker build -t auth-service .
+
+      - name: Save private key
+        run: |
+          echo "${{ secrets.VM_KEY }}" > key.pem
+          chmod 600 key.pem
+
+      - name: Copy files to VM
+        run: |
+          scp -o StrictHostKeyChecking=no -i key.pem -r . ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/${{ secrets.VM_USER }}/node-app
+
+      - name: Run Docker container on VM
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+            cd /home/${{ secrets.VM_USER }}/node-app
+            docker build -t auth-service .
+            docker stop node-container || true
+            docker rm node-container || true
+            docker run -d -p 5000:5000 --name node-container auth-service
+          EOF
