@@ -30,17 +30,35 @@ jobs:
           echo "${{ secrets.VM_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Copy files to VM
+      - name: Copy files to VM (and update if already exists)
         run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+            # Check if the authService folder exists and remove it
+            if [ -d "/home/${{ secrets.VM_USER }}/authService" ]; then
+              rm -rf /home/${{ secrets.VM_USER }}/authService
+            fi
+            # Copy the updated files
+            exit
+          EOF
           scp -o StrictHostKeyChecking=no -i key.pem -r . ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/${{ secrets.VM_USER }}/authService
+
+      - name: Stop and remove any running containers named auth-service
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+            docker stop node-container || true
+            docker rm node-container || true
+          EOF
+
+      - name: Remove previous Docker images named auth-service
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+            docker rmi -f auth-service || true
+          EOF
 
       - name: Run Docker container on VM
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
             cd /home/${{ secrets.VM_USER }}/authService
             docker build -t auth-service .
-            docker stop node-container || true
-            docker rm node-container || true
             docker run -d -p 5000:5000 --name node-container auth-service
           EOF
-
