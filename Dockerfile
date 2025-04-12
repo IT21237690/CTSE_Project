@@ -10,8 +10,8 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Stage 2: Final image
-FROM node:18
+# Stage 2: Final image (named "final" stage)
+FROM node:18 AS final
 
 # Set working directory inside the container
 WORKDIR /app
