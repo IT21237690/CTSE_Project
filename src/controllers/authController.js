@@ -2,6 +2,8 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const JWT_SECRET = 'reserch';
+
 // Register a new user
 exports.register = async (req, res) => {
     const { firstname, lastname, username, email, password, grade, role } = req.body;
@@ -49,7 +51,7 @@ exports.login = async (req, res) => {
         if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
         // Ensure JWT_SECRET is properly set
-        if (!process.env.JWT_SECRET) {
+        if (!JWT_SECRET) {
             return res.status(500).json({ msg: "JWT secret key is missing. Please check your .env file." });
         }
 
@@ -69,7 +71,7 @@ exports.login = async (req, res) => {
         };
 
         // Sign JWT token with HS256 algorithm
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256", expiresIn: "1h" });
+        const token = jwt.sign(payload, JWT_SECRET, { algorithm: "HS256", expiresIn: "1h" });
 
         // Return token and user details
         res.json({
