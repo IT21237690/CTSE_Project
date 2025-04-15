@@ -1,64 +1,36 @@
-name: Deploy to Assure VM
+name: Build and Push Docker Image to ACR
 
 on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  build_and_push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      # Step 1: Checkout the repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step 2: Set up Docker BuildKit
       - name: Set up Docker BuildKit
-        run: echo "DOCKER_BUILDKIT=1" >> $GITHUB_ENV  # Enabling BuildKit
+        run: echo "DOCKER_BUILDKIT=1" >> $GITHUB_ENV  # Enable BuildKit for advanced features
 
+      # Step 3: Set up Docker Buildx
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
-      - name: Build app dependencies
+      # Step 4: Build Docker image
+      - name: Build Docker image
         run: |
-          docker build --target build-deps -t auth-service .
+          docker build -t ctseas1.azurecr.io/myapp:v1 .
 
-      - name: Build final Docker image
+      # Step 5: Log in to Azure Container Registry (ACR)
+      - name: Log in to Azure Container Registry
         run: |
-          docker build --target final -t auth-service .
+          echo "${{ secrets.ACR_PASSWORD }}" | docker login ctseas1.azurecr.io --username ${{ secrets.ACR_USERNAME }} --password-stdin
 
-      - name: Save private key
+      # Step 6: Push the Docker image to ACR
+      - name: Push Docker image to ACR
         run: |
-          echo "${{ secrets.VM_KEY }}" > key.pem
-          chmod 600 key.pem
-
-      - name: Copy files to VM (and update if already exists)
-        run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-            # Check if the authService folder exists and remove it
-            if [ -d "/home/${{ secrets.VM_USER }}/authService" ]; then
-              rm -rf /home/${{ secrets.VM_USER }}/authService
-            fi
-            # Copy the updated files
-            exit
-          EOF
-          scp -o StrictHostKeyChecking=no -i key.pem -r . ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/${{ secrets.VM_USER }}/authService
-
-      - name: Stop and remove any running containers named auth-service
-        run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-            docker stop node-container || true
-            docker rm node-container || true
-          EOF
-
-      - name: Remove previous Docker images named auth-service
-        run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-            docker rmi -f auth-service || true
-          EOF
-
-      - name: Run Docker container on VM
-        run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-            cd /home/${{ secrets.VM_USER }}/authService
-            docker build -t auth-service .
-            docker run -d -p 5000:5000 --name node-container auth-service
-          EOF
+          docker push ctseas1.azurecr.io/myapp:v1
