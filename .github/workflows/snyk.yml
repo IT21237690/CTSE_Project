@@ -30,5 +30,9 @@ jobs:
       # Step 4: Run the Snyk test to scan for vulnerabilities
       - name: Snyk test
         run: snyk test
+
+     # Monitor the project with Snyk (optional but recommended)
+      - name: Monitor the project with Snyk
+        run: snyk monitor
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}   
