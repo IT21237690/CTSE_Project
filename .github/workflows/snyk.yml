@@ -15,11 +15,11 @@ jobs:
     steps:
       # Step 1: Checkout the repository code
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@master
 
       # Step 2: Set up Snyk CLI (use stable version instead of @master)
       - name: Set up Snyk CLI
-        uses: snyk/actions/setup@v1  # or specify the latest stable version
+        uses: snyk/actions/setup@master  # or specify the latest stable version
 
       # Step 3: Set up Go (adjust Go version as needed)
       - name: Set up Go
