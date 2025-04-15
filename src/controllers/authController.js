@@ -57,6 +57,7 @@ exports.login = async (req, res) => {
 
         // Create JWT payload (excluding password)
         const payload = {
+            sub: user._id,
             id: user._id,
             firstname: user.firstname,
             lastname: user.lastname,
