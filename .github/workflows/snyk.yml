@@ -13,20 +13,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the code
+      # Step 1: Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Set up Snyk CLI
+      # Step 2: Set up Snyk CLI (use stable version instead of @master)
       - name: Set up Snyk CLI
-        uses: snyk/actions/setup@v1  # Ensure this is correct version
+        uses: snyk/actions/setup@v1  # or specify the latest stable version
 
-      # Run Snyk test to find vulnerabilities in code and dependencies
-      - name: Run Snyk test
+      # Step 3: Set up Go (adjust Go version as needed)
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.19'
+
+      # Step 4: Run the Snyk test to scan for vulnerabilities
+      - name: Snyk test
         run: snyk test
-
-      # Monitor the project with Snyk (optional but recommended)
-      - name: Monitor the project with Snyk
-        run: snyk monitor
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
