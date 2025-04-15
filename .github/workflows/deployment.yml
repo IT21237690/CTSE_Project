@@ -16,7 +16,7 @@ jobs:
       - name: Set up SSH Agent
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.VM_KEY }}
 
       # Step 3: Log in to Azure Container Registry (ACR)
       - name: Log in to Azure Container Registry
