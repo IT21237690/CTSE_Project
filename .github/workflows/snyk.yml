@@ -1,0 +1,34 @@
+name: Snyk Security Scan
+
+on:
+  push:
+    branches:
+      - main  # Adjust branch name if needed
+  pull_request:
+    branches:
+      - main  # Adjust branch name if needed
+
+jobs:
+  snyk:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Set up Snyk CLI
+      - name: Set up Snyk CLI
+        uses: snyk/actions/setup@v1
+        with:
+          version: 'latest'
+
+      # Run Snyk test to find vulnerabilities in code and dependencies
+      - name: Run Snyk test
+        run: snyk test
+
+      # Monitor the project with Snyk (optional but recommended)
+      - name: Monitor the project with Snyk
+        run: snyk monitor
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
