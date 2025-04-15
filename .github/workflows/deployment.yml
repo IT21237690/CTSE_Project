@@ -1,4 +1,4 @@
-name: Deploy Docker Image to Azure VM
+name: Deploy Docker Image to VM
 
 on:
   workflow_dispatch:
