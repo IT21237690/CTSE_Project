@@ -19,9 +19,7 @@ jobs:
 
       # Set up Snyk CLI
       - name: Set up Snyk CLI
-        uses: snyk/actions/setup@v1
-        with:
-          version: 'latest'
+        uses: snyk/actions/setup@v1  # Ensure this is correct version
 
       # Run Snyk test to find vulnerabilities in code and dependencies
       - name: Run Snyk test
