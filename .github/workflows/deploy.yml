@@ -23,14 +23,14 @@ jobs:
       # Step 4: Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t ctseas1.azurecr.io/myapp:v1 .
+          docker build -t ${{ secrets.ACR_REGISTRY_URL }}/auth-service:latest .
 
       # Step 5: Log in to Azure Container Registry (ACR)
       - name: Log in to Azure Container Registry
         run: |
-          echo "${{ secrets.ACR_PASSWORD }}" | docker login ctseas1.azurecr.io --username ${{ secrets.ACR_USERNAME }} --password-stdin
+          echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_REGISTRY_URL }} --username ${{ secrets.ACR_USERNAME }} --password-stdin
 
       # Step 6: Push the Docker image to ACR
       - name: Push Docker image to ACR
         run: |
-          docker push ctseas1.azurecr.io/myapp:v1
+          docker push ${{ secrets.ACR_REGISTRY_URL }}/auth-service:latest
