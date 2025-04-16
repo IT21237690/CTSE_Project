@@ -29,6 +29,6 @@ jobs:
         with:
           args: >
             -Dsonar.organization=minidu-tissera
-            -Dsonar.projectKey=it21237690
+            -Dsonar.projectKey=CTSE_Project
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
