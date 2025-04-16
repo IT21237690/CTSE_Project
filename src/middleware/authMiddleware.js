@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
 
     try {
         const extractedToken = token.split(" ")[1];
-        const decoded = jwt.verify(extractedToken, process.env.process.env.JWT_SECRET);
+        const decoded = jwt.verify(extractedToken, process.env.JWT_SECRET);
 
         if (!decoded.id) {
             return res.status(401).json({ msg: "Invalid token: No user ID found" });
