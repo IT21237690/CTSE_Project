@@ -1,4 +1,4 @@
-name: SonarCloud
+name: SonarCloud Scan
 
 on:
   push:
@@ -6,14 +6,15 @@ on:
       - main
 
 jobs:
-  build:
+  sonarcloud:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Required for full analysis
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -21,10 +22,7 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Run tests & generate coverage
-        run: npm test -- --coverage
+        run: npm ci
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
@@ -32,6 +30,5 @@ jobs:
           args: >
             -Dsonar.organization=your_org_name
             -Dsonar.projectKey=your_project_key
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
