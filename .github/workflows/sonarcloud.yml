@@ -28,7 +28,7 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.organization=your_org_name
-            -Dsonar.projectKey=your_project_key
+            -Dsonar.organization=Minidu Tissera
+            -Dsonar.projectKey=it21237690
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
