@@ -37,8 +37,12 @@ jobs:
       - name: Check SonarCloud analysis result
         run: |
           echo "Checking if SonarCloud passed"
-          if [ $(curl -s -u ${{ secrets.SONAR_TOKEN }} "https://sonarcloud.io/api/project_branches/list?project=IT21237690_CTSE_Project" | jq '.branches[0].status') != '"OK"' ]; then
-            echo "SonarCloud check failed, stopping build."
+          # Fetch the SonarCloud project branch status
+          STATUS=$(curl -s -u ${{ secrets.SONAR_TOKEN }} "https://sonarcloud.io/api/project_branches/list?project=IT21237690_CTSE_Project" | jq -r '.branches[0].status')
+      
+          # Check if the status is 'OK'
+          if [ "$STATUS" != "OK" ]; then
+            echo "SonarCloud check failed with status: $STATUS, stopping build."
             exit 1
           fi
 
