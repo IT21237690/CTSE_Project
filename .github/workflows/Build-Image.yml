@@ -34,10 +34,22 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       # Step 5: Check SonarCloud analysis result
+      - name: Wait for SonarCloud to finish processing (if needed)
+        run: |
+          echo "Waiting for SonarCloud to finish processing (this may take a few seconds)"
+          sleep 30  # Wait for 30 seconds (you can adjust this time based on your needs)
+          
       - name: Check SonarCloud analysis result
         run: |
           echo "Checking if SonarCloud passed"
-          QUALITY_GATE_STATUS=$(curl -s -u ${{ secrets.SONAR_TOKEN }} "https://sonarcloud.io/api/project_branches/list?project=IT21237690_CTSE_Project" | jq -r '.branches[0].qualityGateStatus')
+          RESPONSE=$(curl -s -u ${{ secrets.SONAR_TOKEN }} "https://sonarcloud.io/api/project_branches/list?project=IT21237690_CTSE_Project")
+          QUALITY_GATE_STATUS=$(echo "$RESPONSE" | jq -r '.branches[0].qualityGateStatus')
+      
+          # Check if the 'qualityGateStatus' is available
+          if [ "$QUALITY_GATE_STATUS" == "null" ]; then
+            echo "Error: Quality gate status is unavailable, stopping build."
+            exit 1
+          fi
       
           # Check if the 'qualityGateStatus' is 'OK'
           if [ "$QUALITY_GATE_STATUS" != "OK" ]; then
