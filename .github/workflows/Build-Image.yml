@@ -39,17 +39,7 @@ jobs:
           echo "Checking if SonarCloud passed"
           RESPONSE=$(curl -s -u ${{ secrets.SONAR_TOKEN }} "https://sonarcloud.io/api/project_branches/list?project=IT21237690_CTSE_Project")
       
-          # Log the entire API response for debugging purposes
-          echo "SonarCloud API response: $RESPONSE"
-          
-          # Correct jq query to access qualityGateStatus inside the 'status' object
           QUALITY_GATE_STATUS=$(echo "$RESPONSE" | jq -r '.branches[0].status.qualityGateStatus')
-      
-          # Check if the 'qualityGateStatus' is available
-          if [ "$QUALITY_GATE_STATUS" == "null" ]; then
-            echo "Error: Quality gate status is unavailable, stopping build."
-            exit 1
-          fi
       
           # Check if the 'qualityGateStatus' is 'OK'
           if [ "$QUALITY_GATE_STATUS" != "OK" ]; then
