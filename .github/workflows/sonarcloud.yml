@@ -30,5 +30,6 @@ jobs:
           args: >
             -Dsonar.organization=it21237690
             -Dsonar.projectKey=IT21237690_CTSE_Project
+            -Dsonar.coverage.exclusions=**
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
