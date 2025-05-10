@@ -42,7 +42,8 @@ jobs:
           # Log the entire API response for debugging purposes
           echo "SonarCloud API response: $RESPONSE"
           
-          QUALITY_GATE_STATUS=$(echo "$RESPONSE" | jq -r '.branches[0].qualityGateStatus')
+          # Correct jq query to access qualityGateStatus inside the 'status' object
+          QUALITY_GATE_STATUS=$(echo "$RESPONSE" | jq -r '.branches[0].status.qualityGateStatus')
       
           # Check if the 'qualityGateStatus' is available
           if [ "$QUALITY_GATE_STATUS" == "null" ]; then
@@ -55,6 +56,7 @@ jobs:
             echo "SonarCloud check failed with quality gate status: $QUALITY_GATE_STATUS, stopping build."
             exit 1
           fi
+
 
       # Step 6: Set up Docker BuildKit
       - name: Set up Docker BuildKit
