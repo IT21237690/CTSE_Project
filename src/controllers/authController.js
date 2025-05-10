@@ -53,7 +53,7 @@ exports.login = async (req, res) => {
 
     try {
         // Use strict validation to check for the user
-        const user = await User.findOne({ username }).exec();
+        const user = await User.findOne({ username: username.toString() }).exec();
         if (!user) return res.status(400).json({ msg: "Invalid credentials" });
 
         // Check if password matches
