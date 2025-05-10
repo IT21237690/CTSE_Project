@@ -2,7 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
+// Helper function for basic input validation
 const validateEmail = (email) => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return re.test(String(email).toLowerCase());
@@ -19,8 +19,8 @@ exports.register = async (req, res) => {
     try {
         // Check if email or username already exists
         const existingUser = await User.findOne({
-            $or: [{ email: email }, { username: username }]
-        }).exec(); // Ensure query execution to prevent injections
+            $or: [{ email: email.toString() }, { username: username.toString() }]
+        }).exec();
         if (existingUser) {
             return res.status(400).json({ msg: "Email or Username already exists" });
         }
