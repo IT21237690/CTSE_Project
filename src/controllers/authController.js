@@ -2,13 +2,25 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+
+const validateEmail = (email) => {
+    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return re.test(String(email).toLowerCase());
+};
+
 // Register a new user
 exports.register = async (req, res) => {
     const { firstname, lastname, username, email, password, role } = req.body;
 
+    if (!validateEmail(email)) {
+        return res.status(400).json({ msg: "Invalid email format" });
+    }
+
     try {
         // Check if email or username already exists
-        let existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        const existingUser = await User.findOne({
+            $or: [{ email: email }, { username: username }]
+        }).exec(); // Ensure query execution to prevent injections
         if (existingUser) {
             return res.status(400).json({ msg: "Email or Username already exists" });
         }
@@ -40,8 +52,8 @@ exports.login = async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        // Find user by email
-        const user = await User.findOne({ username });
+        // Use strict validation to check for the user
+        const user = await User.findOne({ username }).exec();
         if (!user) return res.status(400).json({ msg: "Invalid credentials" });
 
         // Check if password matches
@@ -85,7 +97,7 @@ exports.login = async (req, res) => {
 // Get logged-in user profile
 exports.getProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password');
+        const user = await User.findById(req.user.id).select('-password').exec();
         res.json(user);
     } catch (err) {
         res.status(500).json({ error: err.message });
